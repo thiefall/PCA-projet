@@ -1,0 +1,176 @@
+---
+title: "ACP"
+author: "El Lamine SOKHNA"
+date: "17/03/2025"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Chargement de pacckages
+```{r}
+library("FactoMineR")
+library("factoextra")
+```
+
+#Importation de la base
+```{r}
+# Charger le fichier
+base <- read.table("ACP_eaux.txt", sep = "\t", fileEncoding = "latin1" , header = TRUE, row.names = 1)
+
+head(base)
+```
+
+#Commençons par extraire les individus actifs et les variables actives pour l’ACP
+```{r}
+base_active= base[, 5:12]
+head(base_active)
+```
+
+
+#Convertir les colonnes en numérique
+
+```{r}
+base_active[] = lapply(base_active, function(x) gsub(",", ".", x))
+
+ 
+base_active[] = lapply(base_active, function(x) as.numeric(x))
+head(base_active) 
+```
+
+
+#Statistiques sommaires des variables
+```{r}
+summary(base_active)
+```
+
+
+#Matrice des corrélations
+```{r}
+mat_cor=cor(base_active)
+mat_cor
+```
+##Interpretatio:
+..............................
+
+
+
+##ACP
+Notez que, par défaut, la fonction PCA(), normalise les données automatiquementpendant l’ACP.
+
+```{r}
+res.pca=PCA(base_active, graph = FALSE)
+res.pca
+res.pca$eig
+```
+
+##Interprétation:
+................................................................................
+
+
+
+
+##Le graphique des valeurs propres
+```{r}
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+```
+
+
+
+### Affichage des vecteurs propres (composantes principales)
+
+```{r}
+vect =res.pca$svd$V
+vect
+```
+
+
+#Graphique des variables
+
+
+```{r}
+value = get_pca_var(res.pca)
+value
+```
+
+
+
+```{r}
+# Coordonnées
+head(var$coord)
+# Cos2: qualité de répresentation
+head(var$cos2)
+# Contributions aux composantes principales
+head(var$contrib)
+```
+##Interpretation:
+...........................
+
+# Coordonnées des variables sur les axes principaux
+
+
+
+
+##Cercle de corrélation
+```{r}
+fviz_pca_var(res.pca)
+```
+
+##Qualité de représentation
+```{r}
+head(var$cos2, 8)
+```
+
+
+```{r}
+fviz_pca_var(res.pca, col.var = "cos2")
+```
+
+```{r}
+fviz_pca_var(res.pca, col.var = "contrib")
+```
+
+##Interpretation:
+..............................................
+
+
+##Visualisation la contribution des individus aux deux premières composantes principales
+
+```{r}
+fviz_pca_ind (res.pca)
+```
+
+#coloration dees individus en fonction de leurs valeurs de cos2:
+```{r}
+fviz_pca_ind (res.pca, col.ind = "cos2",
+ gradient.cols = c("blue", "yellow", "red"),
+ repel = TRUE)
+```
+#Modification la taille des points en fonction du cos2 des individus correspondants:
+```{r}
+fviz_pca_ind (res.pca, pointsize = "cos2",
+ pointshape = 22, fill = "red",
+ repel = TRUE )
+```
+##Interpretation:
+............................................
+
+
+
+
+
+#visualisation de la contribution des individus aux deux premières composantes principales
+```{r}
+# Contribution totale sur PC1 et PC2
+fviz_contrib(res.pca, choice = "ind", axes = 1:2)
+```
+
+##Interpretation:
+........................................
+
+
+
+
+
